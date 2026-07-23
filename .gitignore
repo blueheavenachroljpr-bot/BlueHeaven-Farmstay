@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+blue_heaven.db
+.env
+.vercel

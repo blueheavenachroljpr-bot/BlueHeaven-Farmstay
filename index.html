@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blue Heaven Farmhouse — Your Private Getaway Near Jaipur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  /* ===== Availability Calendar ===== */
+  .avail-calendar-wrap {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 24px rgba(11,60,93,0.13);
+    margin-bottom: 24px;
+    border: 1px solid var(--sand-dark);
+  }
+  .avail-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .avail-cal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    color: var(--ocean-deep);
+    font-weight: 600;
+  }
+  .avail-cal-nav {
+    background: none;
+    border: 1px solid var(--sand-dark);
+    color: var(--ocean-deep);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s;
+    font-size: 0.9rem;
+  }
+  .avail-cal-nav:hover { background: var(--ocean-deep); color: white; }
+  .avail-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+  .avail-cal-dayname {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ocean);
+    padding: 4px 0 6px;
+  }
+  .avail-cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+    color: var(--ink);
+    user-select: none;
+  }
+  .avail-cal-day.empty { cursor: default; }
+  .avail-cal-day.past {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  .avail-cal-day.booked {
+    background: #fee2e2;
+    color: #b91c1c;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    font-weight: 500;
+  }
+  .avail-cal-day.booked::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 4px;
+    border: 1.5px solid #fca5a5;
+  }
+  .avail-cal-day.available:hover {
+    background: var(--beach-light);
+    color: var(--ocean-deep);
+    font-weight: 600;
+  }
+  .avail-cal-day.selected-start, .avail-cal-day.selected-end {
+    background: var(--beach) !important;
+    color: var(--ocean-deep) !important;
+    font-weight: 700;
+    border-radius: 6px;
+  }
+  .avail-cal-day.in-range {
+    background: var(--beach-light);
+    color: var(--ocean-deep);
+    border-radius: 0;
+  }
+  .avail-cal-day.today {
+    border: 2px solid var(--sky);
+    font-weight: 700;
+    color: var(--ocean);
+  }
+  .avail-cal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 12px;
+    font-size: 0.7rem;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .avail-cal-legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .avail-cal-status {
+    text-align: center;
+    font-size: 0.72rem;
+    margin-top: 8px;
+    min-height: 18px;
+    color: var(--ocean);
+    letter-spacing: 0.04em;
+  }
+  :root{
+    --ocean-deep:#0b3c5d; /* Deep Blue */
+    --ocean:#14507a;       /* Mid Blue */
+    --sky:#328cc1;         /* Bright Sky Blue */
+    --beach:#e6b450;       /* Sandy Gold / Sun */
+    --beach-light:#f0d78a; /* Light Sand */
+    --sand:#f4f9fc;        /* Icy White Sand */
+    --sand-dark:#dfeaf0;   /* Seashell Grey */
+    --ink:#1a1a1a;
+  }
+  *{ -webkit-font-smoothing:antialiased; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:'Jost', sans-serif;
+    background:var(--sand);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  .font-display{ font-family:'Cormorant Garamond', serif; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar{ width:10px; }
+  ::-webkit-scrollbar-track{ background:var(--sand); }
+  ::-webkit-scrollbar-thumb{ background:var(--sky); border-radius:10px; }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--ocean-deep); }
+
+  /* Hero kenburns */
+  @keyframes kenburns{
+    0%{ transform:scale(1) translateY(0); }
+    100%{ transform:scale(1.15) translateY(-2%); }
+  }
+  .kenburns{ animation:kenburns 18s ease-out infinite alternate; }
+
+  /* Reveal on scroll */
+  .reveal{ opacity:0; transform:translateY(40px); transition:opacity 1s cubic-bezier(.2,.7,.2,1), transform 1s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+  .reveal-delay-1{ transition-delay:.15s; }
+  .reveal-delay-2{ transition-delay:.3s; }
+  .reveal-delay-3{ transition-delay:.45s; }
+
+  /* Nav link underline */
+  .nav-link{ position:relative; }
+  .nav-link::after{
+    content:''; position:absolute; left:0; bottom:-6px; height:1px; width:0;
+    background:var(--beach); transition:width .4s ease;
+  }
+  .nav-link:hover::after{ width:100%; }
+
+  /* Header Scroll States */
+  #header {
+    background: transparent;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+  #header.scrolled {
+    background: #ffffff;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+  }
+  /* Text colors */
+  #header .nav-link, #header #menuBtn { 
+    color: var(--sand); 
+    transition: color 0.3s ease; 
+  }
+  #header.scrolled .nav-link, #header.scrolled #menuBtn { 
+    color: var(--ocean-deep); 
+  }
+  /* Logo Shadow */
+  #header .logo-img { 
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); 
+    transition: filter 0.3s ease; 
+  }
+  #header.scrolled .logo-img { 
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
+  }
+
+  /* Buttons */
+  .btn-beach{
+    background:var(--beach);
+    color:var(--ocean-deep);
+    transition:all .4s ease;
+    position:relative; overflow:hidden;
+  }
+  .btn-beach::before{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.5), transparent);
+    transform:translateX(-100%);
+    transition:transform .6s ease;
+  }
+  .btn-beach:hover::before{ transform:translateX(100%); }
+  .btn-beach:hover{ background:var(--beach-light); transform:translateY(-2px); box-shadow:0 12px 30px -8px rgba(230,180,80,.5); }
+
+  .btn-outline{
+    border:1px solid rgba(244,249,252,.4);
+    color:var(--sand);
+    transition:all .4s ease;
+  }
+  .btn-outline:hover{ background:var(--sand); color:var(--ocean-deep); border-color:var(--sand); }
+
+  /* Gallery hover */
+  .gallery-item img{ transition:transform 1.2s cubic-bezier(.2,.7,.2,1); }
+  .gallery-item:hover img{ transform:scale(1.08); }
+
+  /* Form input */
+  .field{
+    background:rgba(255,255,255,.7);
+    border:1px solid rgba(11,60,93,.15);
+    transition:all .3s ease;
+  }
+  .field:focus{
+    outline:none;
+    border-color:var(--beach);
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(230,180,80,.15);
+  }
+
+  /* Marquee */
+  .marquee{ display:flex; gap:4rem; animation:marq 30s linear infinite; }
+  @keyframes marq{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+
+  /* Section heading divider */
+  .divider-leaf{
+    display:flex; align-items:center; gap:1rem; justify-content:center;
+    color:var(--beach);
+  }
+  .divider-leaf::before, .divider-leaf::after{
+    content:''; height:1px; width:60px; background:var(--beach); opacity:.5;
+  }
+
+  /* Hero text reveal */
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(60px); }
+    to{ opacity:1; transform:none; }
+  }
+  .rise{ animation:riseIn 1.2s cubic-bezier(.2,.7,.2,1) both; }
+
+  /* Package card */
+  .pkg-card{
+    transition:transform .5s ease, box-shadow .5s ease;
+  }
+  .pkg-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 30px 60px -20px rgba(11,60,93,.35);
+  }
+
+  /* Number counter */
+  .stat-num{ font-variant-numeric:tabular-nums; }
+
+  /* Mobile menu */
+  .mobile-menu{ transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+  .mobile-menu.closed{ transform:translateX(100%); }
+
+  /* Video play button pulse */
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(230,180,80,.6); }
+    70%{ box-shadow:0 0 0 22px rgba(230,180,80,0); }
+    100%{ box-shadow:0 0 0 0 rgba(230,180,80,0); }
+  }
+  .play-pulse{ animation:pulse 2s infinite; }
+
+  /* Toast - FIXED VISIBILITY */
+  .toast{
+    position:fixed; 
+    bottom:-150px; /* Pushed completely off screen */
+    left:50%; 
+    transform:translateX(-50%);
+    background:var(--ocean-deep); 
+    color:var(--sand);
+    padding:1rem 1.8rem; 
+    border-radius:999px; 
+    z-index:200;
+    transition:bottom .5s cubic-bezier(.2,.7,.2,1), opacity .5s ease;
+    border:1px solid var(--beach);
+    box-shadow:0 20px 40px -10px rgba(0,0,0,.4);
+    opacity:0;
+    pointer-events:none;
+  }
+  .toast.show{ 
+    bottom:30px; 
+    opacity:1; 
+    pointer-events:auto;
+  }
+
+  /* Image grain overlay */
+  .grain::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    opacity:.08; mix-blend-mode:overlay;
+  }
+
+  /* Parallax leaf */
+  .leaf-deco{ position:absolute; pointer-events:none; opacity:.5; }
+
+  /* Full Gallery Overlay */
+  #fullGalleryOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--ocean-deep);
+    z-index: 100;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #fullGalleryOverlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .full-gallery-grid img {
+    transition: transform 0.5s ease, filter 0.5s ease;
+  }
+  .full-gallery-grid img:hover {
+    transform: scale(1.03);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body class="bg-[var(--sand)]">
+
+<!-- ============ HEADER ============ -->
+<header id="header" class="fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    
+    <!-- LOGO IMAGE -->
+    <a href="#home" class="flex items-center group">
+      <img src="/items/Untitled design.png" 
+           alt="Blue Heaven Farmhouse Logo" 
+           class="logo-img h-16 md:h-24 w-auto object-contain">
+    </a>
+
+    <!-- DESKTOP NAV -->
+    <nav class="hidden lg:flex items-center gap-10 text-sm tracking-wider uppercase" id="topnav">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#amenities" class="nav-link">Amenities</a>
+      <a href="#gallery" class="nav-link">Gallery</a>
+      <a href="#packages" class="nav-link">Packages</a>
+      <a href="#video" class="nav-link">Film</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+
+    <a href="#book" class="hidden lg:inline-block btn-beach px-6 py-3 text-sm uppercase tracking-widest font-medium">Book Your Stay</a>
+
+    <!-- Mobile menu button -->
+    <button id="menuBtn" class="lg:hidden text-2xl"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- Mobile menu -->
+<div id="mobileMenu" class="mobile-menu closed fixed top-0 right-0 h-full w-72 bg-[var(--ocean-deep)] z-50 flex flex-col p-8 text-[var(--sand)]">
+  <button id="closeMenu" class="self-end text-2xl mb-8"><i class="fa-solid fa-xmark"></i></button>
+  <nav class="flex flex-col gap-6 text-sm uppercase tracking-widest">
+    <a href="#home" class="mob-link border-b border-white/10 pb-3">Home</a>
+    <a href="#about" class="mob-link border-b border-white/10 pb-3">About</a>
+    <a href="#amenities" class="mob-link border-b border-white/10 pb-3">Amenities</a>
+    <a href="#gallery" class="mob-link border-b border-white/10 pb-3">Gallery</a>
+    <a href="#packages" class="mob-link border-b border-white/10 pb-3">Packages</a>
+    <a href="#video" class="mob-link border-b border-white/10 pb-3">Film</a>
+    <a href="#contact" class="mob-link border-b border-white/10 pb-3">Contact</a>
+  </nav>
+  <a href="#book" class="mob-link btn-beach px-6 py-3 text-center text-sm uppercase tracking-widest mt-8">Book Your Stay</a>
+  <div class="mt-auto text-xs opacity-70">
+    <p>Near Jaipur</p>
+    <p>+91 98281 80067</p>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section id="home" class="relative h-screen min-h-[700px] overflow-hidden grain">
+  <!-- Background video/image -->
+  <div class="absolute inset-0">
+    <!-- Slideshow Images -->
+    <div class="hero-slideshow">
+      <img src="/items/photo 4.png" alt="Slide 1" class="w-full h-full object-cover absolute inset-0 slide">
+      <img src="/items/photo 2.png" alt="Slide 2" class="w-full h-full object-cover absolute inset-0 slide" style="animation-delay: 4s;">
+      <img src="/items/photo 3.png" alt="Slide 3" class="w-full h-full object-cover absolute inset-0 slide" style="animation-delay: 8s;">
+      <img src="/items/photo 8.png" alt="Slide 4" class="w-full h-full object-cover absolute inset-0 slide" style="animation-delay: 12s;">
+    </div>
+    
+    <style>
+      .hero-slideshow .slide {
+        opacity: 0;
+        animation: crossfade 16s infinite;
+      }
+      .hero-slideshow img:nth-child(1) { animation-delay: 0s; }
+      .hero-slideshow img:nth-child(2) { animation-delay: 4s; }
+      .hero-slideshow img:nth-child(3) { animation-delay: 8s; }
+      .hero-slideshow img:nth-child(4) { animation-delay: 12s; }
+      
+      @keyframes crossfade {
+        0%, 100% { opacity: 0; transform: scale(1.05); }
+        10%, 25% { opacity: 1; transform: scale(1); }
+        35% { opacity: 0; transform: scale(1.05); }
+      }
+    </style>
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--ocean-deep)]/70 via-[var(--ocean-deep)]/40 to-[var(--ocean-deep)]/85"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-[var(--ocean-deep)]/60 to-transparent"></div>
+  </div>
+
+  <!-- Hero content -->
+  <div class="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-6">
+    <div class="max-w-3xl">
+      <div class="flex items-center gap-3 text-[var(--sky)] mb-6 rise" style="animation-delay:.2s;">
+        <span class="h-px w-12 bg-[var(--sky)]"></span>
+        <span class="text-xs uppercase tracking-[0.4em]">Near Jaipur · Private Getaway</span>
+      </div>
+      <h1 class="font-display text-5xl md:text-7xl lg:text-8xl text-[var(--sand)] leading-[0.95] rise" style="animation-delay:.4s;">
+        Blue Heaven <em class="text-[var(--sky)] font-light">FarmHouse</em>
+      </h1>
+      <p class="text-white text-lg md:text-xl mt-8 max-w-xl leading-relaxed rise" style="animation-delay:.7s;">
+        Come stay at Blue Heaven Farmhouse, a beautiful and comfy place just outside Jaipur. A 100% safe, secure, and pet-friendly venue for families and couples.
+      </p>
+      <div class="flex flex-wrap items-center gap-4 mt-10 rise" style="animation-delay:.9s;">
+        <a href="#book" class="btn-beach px-8 py-4 text-sm uppercase tracking-widest font-medium">Reserve Your Stay</a>
+        <a href="#video" class="btn-outline px-8 py-4 text-sm uppercase tracking-widest font-medium flex items-center gap-3">
+          <i class="fa-solid fa-play text-xs"></i> Watch Film
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll cue -->
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[var(--sand)]/70 text-xs uppercase tracking-widest">
+    <span>Scroll</span>
+    <div class="w-px h-12 bg-[var(--sand)]/40 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1/2 bg-[var(--beach)]" style="animation:scrollcue 2s ease-in-out infinite;"></div>
+    </div>
+  </div>
+  <style>@keyframes scrollcue{ 0%{transform:translateY(-100%);} 100%{transform:translateY(200%);} }</style>
+</section>
+
+<!-- ============ MARQUEE STRIP ============ -->
+<div class="bg-[var(--ocean-deep)] text-[var(--sand)] py-5 overflow-hidden border-y border-[var(--beach)]/20">
+  <div class="marquee whitespace-nowrap text-sm uppercase tracking-[0.3em]">
+    <span class="flex items-center gap-4"><i class="fa-solid fa-water-ladder text-[var(--beach)]"></i> Daily Cleaned Pool</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-snowflake text-[var(--beach)]"></i> AC Rooms</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-paw text-[var(--beach)]"></i> Pet Friendly</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-bolt text-[var(--beach)]"></i> 24/7 Electricity</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-utensils text-[var(--beach)]"></i> Zomato & Swiggy Delivery</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-water-ladder text-[var(--beach)]"></i> Daily Cleaned Pool</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-snowflake text-[var(--beach)]"></i> AC Rooms</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-paw text-[var(--beach)]"></i> Pet Friendly</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-bolt text-[var(--beach)]"></i> 24/7 Electricity</span>
+    <span class="flex items-center gap-4"><i class="fa-solid fa-utensils text-[var(--beach)]"></i> Zomato & Swiggy Delivery</span>
+  </div>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="relative py-28 md:py-40 bg-[var(--sand)] overflow-hidden">
+  <!-- Decorative leaf -->
+  <svg class="leaf-deco top-20 right-10 w-32 opacity-20" viewBox="0 0 100 100"><path d="M50 10 Q80 30 50 90 Q20 30 50 10 Z" fill="var(--sky)"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+    <!-- Image collage -->
+    <div class="reveal relative">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-4">
+          <img src="/items/photo 2.png" 
+               class="w-full h-72 object-cover rounded-sm" alt="Pool view" onerror="this.src='/items/photo 2.png'">
+          <img src="/items/photo 3.png" 
+               class="w-full h-48 object-cover rounded-sm" alt="Lawn" onerror="this.src='/items/photo 3.png'">
+        </div>
+        <div class="space-y-4 pt-10">
+          <img src="/items/photo 4.png" 
+               class="w-full h-48 object-cover rounded-sm" alt="Interior" onerror="this.src='/items/photo 4.png'">
+          <img src="/items/photo 5.png" 
+               class="w-full h-72 object-cover rounded-sm" alt="Garden" onerror="this.src='/items/photo 5.png'">
+        </div>
+      </div>
+      <!-- Floating stat -->
+      <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-[var(--ocean-deep)] text-[var(--sand)] px-8 py-5 rounded-sm shadow-2xl text-center">
+        <div class="font-display text-4xl text-[var(--beach)]">100%</div>
+        <div class="text-xs uppercase tracking-widest mt-1">Safe & Secure</div>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <div class="reveal reveal-delay-1">
+      <div class="divider-leaf justify-start mb-6">
+        <span class="text-xs uppercase tracking-[0.4em]">About Blue Heaven Farmhouse</span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl text-[var(--ocean-deep)] leading-tight mb-8">
+        A sanctuary where <em class="text-[var(--beach)]">nature meets</em> comfort.
+      </h2>
+      <p class="text-[var(--ink)]/75 leading-relaxed mb-6 text-lg">
+        Tucked just outside the bustling city of Jaipur, Blue Heaven Farmhouse is a beautiful and comfy place to unwind. The venue is 100% safe and secure, ensuring a worry-free experience for families and couples.
+      </p>
+      <p class="text-[var(--ink)]/75 leading-relaxed mb-10">
+        Guests have full access to the entire property—including the swimming pool, garden area, indoor and outdoor seating, games equipment, and private parking. You’ll enjoy complete privacy during your stay with no shared spaces.
+      </p>
+
+      <div class="grid grid-cols-3 gap-6 border-t border-[var(--ocean-deep)]/15 pt-8">
+        <div>
+          <div class="font-display text-3xl text-[var(--ocean-deep)]">24/7</div>
+          <div class="text-xs uppercase tracking-widest text-[var(--ink)]/60 mt-1">Power Backup</div>
+        </div>
+        <div>
+          <div class="font-display text-3xl text-[var(--ocean-deep)]">100%</div>
+          <div class="text-xs uppercase tracking-widest text-[var(--ink)]/60 mt-1">Private Access</div>
+        </div>
+        <div>
+          <div class="font-display text-3xl text-[var(--ocean-deep)]">All</div>
+          <div class="text-xs uppercase tracking-widest text-[var(--ink)]/60 mt-1">Pets Welcome</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AMENITIES ============ -->
+<section id="amenities" class="py-28 md:py-40 bg-[var(--ocean-deep)] text-[var(--sand)] relative overflow-hidden">
+  <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 20%, var(--beach) 0%, transparent 40%), radial-gradient(circle at 80% 70%, var(--sky) 0%, transparent 40%);"></div>
+  
+  <div class="max-w-7xl mx-auto px-6 relative">
+    <div class="text-center mb-20 reveal">
+      <div class="divider-leaf mb-6">
+        <span class="text-xs uppercase tracking-[0.4em]">What You'll Love</span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl">Curated <em class="text-[var(--beach)]">Comforts</em></h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Card 1 -->
+      <div class="reveal group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-water-ladder text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Daily Cleaned Pool</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">Private swimming pool cleaned and refilled with fresh water daily to ensure maximum hygiene.</p>
+      </div>
+      <!-- Card 2 -->
+      <div class="reveal reveal-delay-1 group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-snowflake text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">AC Rooms</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">Cool and cozy air-conditioned rooms to relax comfortably after a long day of fun.</p>
+      </div>
+      <!-- Card 3 -->
+      <div class="reveal reveal-delay-2 group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-tree text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Big Green Lawns</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">Expansive, lush green lawns perfect for relaxing, playing, or hosting outdoor events.</p>
+      </div>
+      <!-- Card 4 -->
+      <div class="reveal reveal-delay-3 group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-volleyball text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Fun Outdoor Games</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">Enjoy cricket, badminton, or volleyball with all games equipment provided onsite.</p>
+      </div>
+      <!-- Card 5 -->
+      <div class="reveal group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-bolt text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">24/7 Electricity</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">No power cuts. Enjoy uninterrupted comfort and convenience throughout your entire stay.</p>
+      </div>
+      <!-- Card 6 -->
+      <div class="reveal reveal-delay-1 group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-utensils text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Yummy Food</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">Choose your favorite meals from our menu. Zomato & Swiggy delivery are also available!</p>
+      </div>
+      <!-- Card 7 -->
+      <div class="reveal reveal-delay-2 group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-paw text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Pet Friendly</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">We love your furry friends! Bring your pets along to enjoy the vacation with you.</p>
+      </div>
+      <!-- Card 8 -->
+      <div class="reveal reveal-delay-3 group bg-white/5 hover:bg-white/10 transition-all duration-500 p-8 border border-white/10 hover:border-[var(--beach)]/50 rounded-sm">
+        <div class="w-14 h-14 flex items-center justify-center bg-[var(--beach)]/15 text-[var(--beach)] mb-6 group-hover:rotate-6 transition-transform duration-500">
+          <i class="fa-solid fa-fire text-2xl"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Bonfire Setup</h3>
+        <p class="text-[var(--sand)]/70 text-sm leading-relaxed">Bonfire setups are available upon request. Perfect for chilly evenings under the stars.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section id="gallery" class="py-28 md:py-40 bg-[var(--sand)]">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-wrap items-end justify-between mb-16 reveal">
+      <div>
+        <div class="divider-leaf justify-start mb-6">
+          <span class="text-xs uppercase tracking-[0.4em]">A Visual Journey</span>
+        </div>
+        <h2 class="font-display text-4xl md:text-6xl text-[var(--ocean-deep)]">The <em class="text-[var(--beach)]">Gallery</em></h2>
+      </div>
+      <p class="max-w-md text-[var(--ink)]/70 mt-6 lg:mt-0">A glimpse of the spaces, light, and moments that await you at Blue Heaven Farmhouse.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[200px] md:auto-rows-[260px]">
+      <div class="gallery-item col-span-2 row-span-2 relative overflow-hidden rounded-sm reveal">
+        <img src="/items/photo 6.png" alt="House Exterior" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+          <span class="text-[var(--sand)] font-display text-2xl">The Property</span>
+        </div>
+      </div>
+      <div class="gallery-item relative overflow-hidden rounded-sm reveal reveal-delay-1">
+        <img src="/items/photo 7.png" alt="Forest Path" class="w-full h-full object-cover">
+      </div>
+      <div class="gallery-item relative overflow-hidden rounded-sm reveal reveal-delay-2">
+        <img src="/items/photo 8.png" alt="Lush Greenery" class="w-full h-full object-cover">
+      </div>
+      <div class="gallery-item relative overflow-hidden rounded-sm reveal">
+        <img src="/items/photo 9.png" alt="Courtyard" class="w-full h-full object-cover">
+      </div>
+      <div class="gallery-item relative overflow-hidden rounded-sm reveal reveal-delay-1">
+        <img src="/items/photo 10.png" alt="Balcony View" class="w-full h-full object-cover">
+      </div>
+      <div class="gallery-item col-span-2 relative overflow-hidden rounded-sm reveal reveal-delay-2">
+        <img src="/items/photo 11.png" alt="Garden Path" class="w-full h-full object-cover">
+      </div>
+      <div class="gallery-item relative overflow-hidden rounded-sm reveal">
+        <img src="/items/photo 12.png" alt="Staircase Landscape" class="w-full h-full object-cover">
+      </div>
+      <div class="gallery-item relative overflow-hidden rounded-sm reveal reveal-delay-1">
+        <img src="/items/photo 13.png" alt="Interior Room" class="w-full h-full object-cover">
+      </div>
+    </div>
+
+    <!-- View More Button -->
+    <div class="text-center mt-12 reveal">
+      <button id="openGalleryBtn" class="btn-beach px-8 py-4 text-sm uppercase tracking-widest font-medium inline-flex items-center gap-2">
+        View More Photos <i class="fa-solid fa-arrow-right text-xs"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FULL GALLERY OVERLAY (NEW PAGE) ============ -->
+<div id="fullGalleryOverlay">
+  <div class="container mx-auto py-20 px-6 relative">
+    <button id="closeGalleryBtn" class="fixed top-6 right-6 text-[var(--ocean-deep)] bg-[var(--beach)] w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-50">
+      <i class="fa-solid fa-xmark text-xl"></i>
+    </button>
+    <div class="text-center mb-16">
+      <div class="divider-leaf mb-6">
+        <span class="text-xs uppercase tracking-[0.4em]">Complete Collection</span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl text-[var(--sand)]">The Full <em class="text-[var(--beach)]">Gallery</em></h2>
+    </div>
+
+    <div class="full-gallery-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <img src="/items/photo 1.png" alt="Photo 1" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 2.png" alt="Photo 2" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 3.png" alt="Photo 3" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 4.png" alt="Photo 4" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 5.png" alt="Photo 5" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 6.png" alt="Photo 6" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 7.png" alt="Photo 7" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 8.png" alt="Photo 8" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 9.png" alt="Photo 9" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 10.png" alt="Photo 10" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 11.png" alt="Photo 11" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 12.png" alt="Photo 12" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 13.png" alt="Photo 13" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 14.png" alt="Photo 14" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 15.png" alt="Photo 15" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 16.png" alt="Photo 16" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 17.png" alt="Photo 17" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 18.png" alt="Photo 18" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 19.png" alt="Photo 19" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 20.png" alt="Photo 20" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 21.png" alt="Photo 21" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 22.png" alt="Photo 22" class="w-full h-72 object-cover rounded-sm shadow-lg">
+      <img src="/items/photo 23.png" alt="Photo 23" class="w-full h-72 object-cover rounded-sm shadow-lg">
+    </div>
+  </div>
+</div>
+
+<!-- ============ VIDEO SECTION ============ -->
+<section id="video" class="relative py-28 md:py-40 bg-[var(--ocean)] text-[var(--sand)] overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 items-center">
+    <div class="lg:col-span-5 reveal">
+      <div class="divider-leaf justify-start mb-6">
+        <span class="text-xs uppercase tracking-[0.4em]">The Film</span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl leading-tight mb-8">Step inside <em class="text-[var(--beach)]">Blue Heaven</em>.</h2>
+      <p class="text-[var(--sand)]/75 leading-relaxed mb-10 text-lg">
+        Press play to wander through our lush green lawns, rippling pool water, and cozy AC rooms. A two-minute escape — until you arrive in person.
+      </p>
+      <a href="#book" class="btn-beach px-8 py-4 text-sm uppercase tracking-widest font-medium inline-block">Plan Your Visit</a>
+    </div>
+    <div class="lg:col-span-7 reveal reveal-delay-1">
+      <div class="relative aspect-video rounded-sm overflow-hidden group cursor-pointer shadow-2xl" id="videoFrame">
+        <video id="farmVideo" class="w-full h-full object-cover" poster="https://z-cdn-media.chatglm.cn/files/9925ecdb-00e2-4846-9a51-47fca7943cc1.png?auth_key=1884699523-f2cddd01d4d94bc2a754a856f9f84a0c-0-682c19def8819a0079d5bbca37749756" 
+               loop muted playsinline>
+          <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-a-luxury-villa-with-pool-2633/1080p.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 flex items-center justify-center" id="videoOverlay">
+          <button class="w-20 h-20 rounded-full bg-[var(--beach)] text-[var(--ocean-deep)] flex items-center justify-center play-pulse hover:scale-110 transition-transform duration-300">
+            <i class="fa-solid fa-play text-2xl ml-1"></i>
+          </button>
+        </div>
+        <div class="absolute bottom-6 left-6 text-[var(--sand)]">
+          <div class="text-xs uppercase tracking-widest opacity-70">A Film By</div>
+          <div class="font-display text-2xl">Blue Heaven Studios</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGES ============ -->
+<section id="packages" class="py-28 md:py-40 bg-[var(--sand)] relative overflow-hidden">
+  <svg class="leaf-deco bottom-20 left-10 w-40 opacity-10 rotate-180" viewBox="0 0 100 100"><path d="M50 10 Q80 30 50 90 Q20 30 50 10 Z" fill="var(--sky)"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 relative">
+    <div class="text-center mb-20 reveal">
+      <div class="divider-leaf mb-6">
+        <span class="text-xs uppercase tracking-[0.4em]">Choose Your Escape</span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl text-[var(--ocean-deep)]">Tailored <em class="text-[var(--beach)]">Packages</em></h2>
+      <p class="text-[var(--ink)]/70 mt-6 max-w-2xl mx-auto">All packages include private access to the entire property. Custom itineraries and special arrangements available on request.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Package 1 -->
+      <div class="pkg-card reveal bg-white border border-[var(--ocean-deep)]/10 rounded-sm overflow-hidden">
+        <div class="relative h-64 overflow-hidden">
+          <img src="/items/photo 14.png" class="w-full h-full object-cover" alt="Day Outing">
+          <div class="absolute inset-0 bg-gradient-to-t from-[var(--ocean-deep)]/80 to-transparent"></div>
+          <div class="absolute bottom-4 left-6 text-[var(--sand)]">
+            <div class="text-xs uppercase tracking-widest opacity-80">8 AM – 6 PM</div>
+            <div class="font-display text-3xl">Day Outing</div>
+          </div>
+        </div>
+        <div class="p-8">
+          <div class="flex items-baseline gap-2 mb-6">
+            <span class="font-display text-5xl text-[var(--ocean-deep)]">₹1,000</span>
+            <span class="text-sm text-[var(--ink)]/60">/ person</span>
+          </div>
+          <ul class="space-y-3 text-sm text-[var(--ink)]/75 mb-8">
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Full access to property & pool</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Outdoor games equipment</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Indoor & outdoor seating</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Menu meal selection available</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> 100% private & secure</li>
+          </ul>
+          <a href="#book" class="block text-center border border-[var(--ocean-deep)] text-[var(--ocean-deep)] py-3 uppercase tracking-widest text-xs hover:bg-[var(--ocean-deep)] hover:text-[var(--sand)] transition">Book Day Outing</a>
+        </div>
+      </div>
+
+      <!-- Package 2 (featured) -->
+      <div class="pkg-card reveal reveal-delay-1 bg-[var(--ocean-deep)] text-[var(--sand)] rounded-sm overflow-hidden relative lg:-mt-6 lg:mb-6 shadow-2xl">
+        <div class="absolute top-4 right-4 bg-[var(--beach)] text-[var(--ocean-deep)] px-3 py-1 text-xs uppercase tracking-widest font-medium">Most Loved</div>
+        <div class="relative h-64 overflow-hidden">
+          <img src="/items/photo 15.png" class="w-full h-full object-cover" alt="Overnight">
+          <div class="absolute inset-0 bg-gradient-to-t from-[var(--ocean-deep)] to-transparent"></div>
+          <div class="absolute bottom-4 left-6">
+            <div class="text-xs uppercase tracking-widest opacity-80">24 Hours</div>
+            <div class="font-display text-3xl text-[var(--sand)]">Overnight Stay</div>
+          </div>
+        </div>
+        <div class="p-8">
+          <div class="flex items-baseline gap-2 mb-6">
+            <span class="font-display text-5xl text-[var(--beach)]">₹2,000</span>
+            <span class="text-sm opacity-70">/ person</span>
+          </div>
+          <ul class="space-y-3 text-sm opacity-90 mb-8">
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Cool & cozy AC rooms</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Private parking included</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Daily cleaned & refilled pool</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> 24/7 electricity backup</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Pet-friendly welcome</li>
+          </ul>
+          <a href="#book" class="block text-center bg-[var(--beach)] text-[var(--ocean-deep)] py-3 uppercase tracking-widest text-xs font-medium hover:bg-[var(--beach-light)] transition">Book Overnight</a>
+        </div>
+      </div>
+
+      <!-- Package 3 -->
+      <div class="pkg-card reveal reveal-delay-2 bg-white border border-[var(--ocean-deep)]/10 rounded-sm overflow-hidden">
+        <div class="relative h-64 overflow-hidden">
+          <img src="/items/photo 16.png" class="w-full h-full object-cover" alt="Celebration">
+          <div class="absolute inset-0 bg-gradient-to-t from-[var(--ocean-deep)]/80 to-transparent"></div>
+          <div class="absolute bottom-4 left-6 text-[var(--sand)]">
+            <div class="text-xs uppercase tracking-widest opacity-80">Full Venue</div>
+            <div class="font-display text-3xl">Celebration</div>
+          </div>
+        </div>
+        <div class="p-8">
+          <div class="flex items-baseline gap-2 mb-6">
+            <span class="font-display text-5xl text-[var(--ocean-deep)]">₹75,000</span>
+            <span class="text-sm text-[var(--ink)]/60">/ day</span>
+          </div>
+          <ul class="space-y-3 text-sm text-[var(--ink)]/75 mb-8">
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Entire farmhouse, private</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Custom birthday decor & setups</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Bonfire setup included</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Group activities & games</li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-[var(--beach)] mt-1"></i> Music allowed (reasonable volume)</li>
+          </ul>
+          <a href="#book" class="block text-center border border-[var(--ocean-deep)] text-[var(--ocean-deep)] py-3 uppercase tracking-widest text-xs hover:bg-[var(--ocean-deep)] hover:text-[var(--sand)] transition">Enquire Now</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-sm text-[var(--ink)]/60 mt-12">All prices are inclusive of taxes. Custom packages available for corporate retreats & weddings — <a href="#contact" class="text-[var(--beach)] underline">ask us</a>.</p>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section class="py-28 md:py-40 bg-[var(--sand-dark)] relative overflow-hidden">
+  <div class="max-w-5xl mx-auto px-6 text-center reveal">
+    <i class="fa-solid fa-quote-left text-[var(--beach)] text-5xl mb-8 opacity-50"></i>
+    <p class="font-display text-3xl md:text-4xl text-[var(--ocean-deep)] leading-relaxed italic mb-10">
+      "We hosted our parents' 30th anniversary at Blue Heaven Farmhouse — and every single guest still talks about it. The team treated us like family, the food was extraordinary, and the private pool was pure magic."
+    </p>
+    <div class="flex items-center justify-center gap-4">
+      <img src="https://picsum.photos/seed/test1/100/100" class="w-14 h-14 rounded-full object-cover" alt="">
+      <div class="text-left">
+        <div class="font-display text-xl text-[var(--ocean-deep)]">Ananya & Rohit Sharma</div>
+        <div class="text-xs uppercase tracking-widest text-[var(--ink)]/60">Jaipur</div>
+      </div>
+    </div>
+    <div class="flex justify-center gap-2 mt-12 text-[var(--beach)]">
+      <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+      <span class="ml-3 text-sm text-[var(--ink)]/70 uppercase tracking-widest">4.9 / 5 from 380+ guests</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BOOKING ============ -->
+<section id="book" class="py-28 md:py-40 bg-[var(--ocean-deep)] text-[var(--sand)] relative overflow-hidden">
+  <div class="absolute inset-0 opacity-20" style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80');background-size:cover;background-position:center;mix-blend-mode:overlay;"></div>
+  
+  <div class="max-w-6xl mx-auto px-6 relative">
+    <div class="grid lg:grid-cols-2 gap-16 items-start">
+      <!-- Left -->
+      <div class="reveal">
+        <div class="divider-leaf justify-start mb-6">
+          <span class="text-xs uppercase tracking-[0.4em]">Reserve Your Dates</span>
+        </div>
+        <h2 class="font-display text-4xl md:text-6xl leading-tight mb-8">Begin your <em class="text-[var(--beach)]">escape</em>.</h2>
+        <p class="text-[var(--sand)]/75 leading-relaxed mb-10 text-lg">
+          Share your preferred dates and package — our team will confirm availability within 4 hours. Please inform us in advance for any special arrangements like birthdays, decorations, or group activities. We’re happy to help make your stay memorable!
+        </p>
+
+        <div class="space-y-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-[var(--beach)]/15 text-[var(--beach)] flex items-center justify-center shrink-0"><i class="fa-solid fa-phone"></i></div>
+            <div>
+              <div class="text-xs uppercase tracking-widest opacity-60">Call us directly</div>
+              <a href="tel:+919828180067" class="font-display text-2xl hover:text-[var(--beach)] transition">+91 98281 80067</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-[var(--beach)]/15 text-[var(--beach)] flex items-center justify-center shrink-0"><i class="fa-regular fa-envelope"></i></div>
+            <div>
+              <div class="text-xs uppercase tracking-widest opacity-60">Email</div>
+              <a href="mailto:stay@blueheaven.com" class="font-display text-2xl hover:text-[var(--beach)] transition">stay@blueheaven.com</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-[var(--beach)]/15 text-[var(--beach)] flex items-center justify-center shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
+            <div>
+              <div class="text-xs uppercase tracking-widest opacity-60">WhatsApp instant</div>
+              <a href="https://wa.me/919828180067?text=Hi%20Jai,%20I'm%20interested%20in%20booking%20Blue%20Heaven%20Farmhouse" target="_blank" class="font-display text-2xl hover:text-[var(--beach)] transition">Chat with owner</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="reveal reveal-delay-1 bg-[var(--sand)] text-[var(--ink)] p-8 md:p-10 rounded-sm shadow-2xl">
+        <form id="bookingForm" class="space-y-5">
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">First Name *</label>
+              <input type="text" id="firstName" required class="field w-full px-4 py-3 rounded-sm" placeholder="John">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Last Name *</label>
+              <input type="text" id="lastName" required class="field w-full px-4 py-3 rounded-sm" placeholder="Doe">
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Email *</label>
+              <input type="email" id="email" required class="field w-full px-4 py-3 rounded-sm" placeholder="john@email.com">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Phone *</label>
+              <input type="tel" id="phone" required class="field w-full px-4 py-3 rounded-sm" placeholder="+91 98XXX XXXXX">
+            </div>
+          </div>
+          <!-- ===== Availability Calendar ===== -->
+          <div class="avail-calendar-wrap">
+            <div class="avail-cal-header">
+              <button type="button" class="avail-cal-nav" id="calPrev"><i class="fa-solid fa-chevron-left"></i></button>
+              <div class="avail-cal-title" id="calMonthLabel">Loading…</div>
+              <button type="button" class="avail-cal-nav" id="calNext"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="avail-cal-grid" id="calGrid"></div>
+            <div class="avail-cal-status" id="calStatus">Fetching availability…</div>
+            <div class="avail-cal-legend">
+              <span><span class="legend-dot" style="background:#fee2e2;border:1.5px solid #fca5a5;"></span> Booked</span>
+              <span><span class="legend-dot" style="background:var(--beach);"></span> Selected</span>
+              <span><span class="legend-dot" style="background:var(--beach-light);"></span> Your range</span>
+              <span><span class="legend-dot" style="border:2px solid var(--sky);"></span> Today</span>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Check-in *</label>
+              <input type="date" id="checkIn" required class="field w-full px-4 py-3 rounded-sm" placeholder="Pick from calendar above">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Check-out *</label>
+              <input type="date" id="checkOut" required class="field w-full px-4 py-3 rounded-sm" placeholder="Pick from calendar above">
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Guests *</label>
+              <input type="number" id="guests" min="1" max="50" value="2" required class="field w-full px-4 py-3 rounded-sm">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Package *</label>
+              <select id="packageSelect" required class="field w-full px-4 py-3 rounded-sm">
+                <option value="">Select package</option>
+                <option value="Day Outing">Day Outing — ₹1,000/person</option>
+                <option value="Overnight Stay">Overnight Stay — ₹2,000/person</option>
+                <option value="Celebration">Celebration — ₹75,000/day</option>
+                <option value="Custom Enquiry">Custom / Wedding enquiry</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-[var(--ink)]/70 mb-2">Special Requests (Decor, Bonfire, Birthdays)</label>
+            <textarea id="specialRequests" rows="3" class="field w-full px-4 py-3 rounded-sm" placeholder="Let us know how we can make your stay memorable!"></textarea>
+          </div>
+          <button type="submit" id="submitBookingBtn" class="btn-beach w-full py-4 text-sm uppercase tracking-widest font-medium flex items-center justify-center gap-2">
+            <span>Send Booking Request</span>
+          </button>
+          <p class="text-xs text-[var(--ink)]/50 text-center">No payment required now. Our team will reach out within minutes to confirm.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT / MAP ============ -->
+<section id="contact" class="py-28 md:py-40 bg-[var(--sand)]">
+  <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+    <div class="reveal">
+      <div class="divider-leaf justify-start mb-6">
+        <span class="text-xs uppercase tracking-[0.4em]">Find Us & House Rules</span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl text-[var(--ocean-deep)] leading-tight mb-8">A short drive from <em class="text-[var(--beach)]">Jaipur</em>.</h2>
+      <p class="text-[var(--ink)]/75 leading-relaxed mb-10 text-lg">
+        Located just outside the main city. Easy access with private parking for all guests.
+      </p>
+      <div class="space-y-5 text-[var(--ink)]/80">
+        <div class="flex gap-4 items-start">
+          <i class="fa-solid fa-location-dot text-[var(--beach)] text-xl mt-1"></i>
+          <div>
+            <div class="font-medium">Address</div>
+            <p>Blue Heaven Farmhouse, Delhi Road, Achrol, Jaipur 303002, Rajasthan</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <i class="fa-solid fa-phone text-[var(--beach)] text-xl mt-1"></i>
+          <div>
+            <div class="font-medium">Reservations</div>
+            <p>+91 98281 80067</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <i class="fa-solid fa-circle-info text-[var(--beach)] text-xl mt-1"></i>
+          <div>
+            <div class="font-medium">Other things to note</div>
+            <p>Music is allowed, but we kindly ask guests to keep volume reasonable, especially at night. Bonfire setups are available on request.</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-10">
+        <a href="https://www.instagram.com/blueheavenfarmstayresort/" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-full border border-[var(--ocean-deep)]/20 flex items-center justify-center hover:bg-[var(--ocean-deep)] hover:text-[var(--sand)] transition"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61592128925986" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-full border border-[var(--ocean-deep)]/20 flex items-center justify-center hover:bg-[var(--ocean-deep)] hover:text-[var(--sand)] transition"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://wa.me/9828180067?text=hello" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-full border border-[var(--ocean-deep)]/20 flex items-center justify-center hover:bg-[var(--ocean-deep)] hover:text-[var(--sand)] transition"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" class="w-11 h-11 rounded-full border border-[var(--ocean-deep)]/20 flex items-center justify-center hover:bg-[var(--ocean-deep)] hover:text-[var(--sand)] transition"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-1 rounded-sm overflow-hidden shadow-2xl h-[500px]">
+      <iframe
+        src="https://maps.google.com/maps?q=Delhi+Road,+Achrol,+Jaipur+303002,+Rajasthan,+India&output=embed"
+        class="w-full h-full"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-[var(--ocean-deep)] text-[var(--sand)] pt-20 pb-10">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-4 gap-12 mb-16">
+      <div class="md:col-span-2">
+        <!-- Footer Logo -->
+        <img src="/items/Untitled design.png" 
+             alt="Blue Heaven Farmhouse Logo" 
+             class="h-28 w-auto object-contain mb-6 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+        <p class="font-display text-3xl mb-4">Your Stay. Our Priority. Pure Bliss.</p>
+        <p class="text-[var(--sand)]/70 max-w-md leading-relaxed">A beautiful, comfy, and 100% private farmhouse getaway crafted for families, couples, and pets.</p>
+      </div>
+      <div>
+        <h4 class="text-xs uppercase tracking-widest text-[var(--beach)] mb-5">Explore</h4>
+        <ul class="space-y-3 text-sm text-[var(--sand)]/75">
+          <li><a href="#about" class="hover:text-[var(--beach)] transition">About Us</a></li>
+          <li><a href="#amenities" class="hover:text-[var(--beach)] transition">Amenities</a></li>
+          <li><a href="#gallery" class="hover:text-[var(--beach)] transition">Gallery</a></li>
+          <li><a href="#packages" class="hover:text-[var(--beach)] transition">Packages</a></li>
+          <li><a href="#book" class="hover:text-[var(--beach)] transition">Book Now</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs uppercase tracking-widest text-[var(--beach)] mb-5">Contact</h4>
+        <ul class="space-y-3 text-sm text-[var(--sand)]/75">
+          <li>Delhi Road, Achrol, Jaipur</li>
+          <li>Rajasthan, 303002</li>
+          <li><a href="tel:+919828180067" class="hover:text-[var(--beach)] transition">+91 98281 80067</a></li>
+          <li><a href="mailto:stay@blueheaven.com" class="hover:text-[var(--beach)] transition">stay@blueheaven.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[var(--sand)]/50">
+      <p>© 2025 Blue Heaven Farmhouse. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a href="#" class="hover:text-[var(--beach)] transition">Privacy Policy</a>
+        <a href="#" class="hover:text-[var(--beach)] transition">Terms & Conditions</a>
+        <a href="#" class="hover:text-[var(--beach)] transition">Cancellation Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast (Hidden by default) -->
+<div id="toast" class="toast"><i class="fa-solid fa-check-circle text-[var(--beach)] mr-2"></i><span id="toastMsg">Booking request sent! We'll call you within 4 hours.</span></div>
+
+<script>
+  // ===== Header scroll behavior =====
+  const header = document.getElementById('header');
+  
+  function updateHeader(){
+    const scrolled = window.scrollY > 80;
+    if(scrolled){
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  }
+  window.addEventListener('scroll', updateHeader);
+  window.addEventListener('resize', updateHeader);
+  updateHeader();
+
+  // ===== Mobile menu =====
+  const menuBtn = document.getElementById('menuBtn');
+  const closeMenu = document.getElementById('closeMenu');
+  const mobileMenu = document.getElementById('mobileMenu');
+  menuBtn.addEventListener('click', () => mobileMenu.classList.remove('closed'));
+  closeMenu.addEventListener('click', () => mobileMenu.classList.add('closed'));
+  document.querySelectorAll('.mob-link').forEach(l => l.addEventListener('click', () => mobileMenu.classList.add('closed')));
+
+  // ===== Scroll reveal =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold:0.15, rootMargin:'0px 0px -60px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ===== Stat counter =====
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const el = e.target;
+        const target = parseInt(el.dataset.target);
+        if(isNaN(target)) return; 
+        const duration = 1800;
+        const start = performance.now();
+        function tick(now){
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString();
+          if(p < 1) requestAnimationFrame(tick);
+          else el.textContent = target.toLocaleString() + (target >= 1000 ? '+' : '');
+        }
+        requestAnimationFrame(tick);
+        statsObserver.unobserve(el);
+      }
+    });
+  }, { threshold:0.5 });
+  document.querySelectorAll('.stat-num').forEach(el => statsObserver.observe(el));
+
+  // ===== Video play =====
+  const videoFrame = document.getElementById('videoFrame');
+  const farmVideo = document.getElementById('farmVideo');
+  const videoOverlay = document.getElementById('videoOverlay');
+  videoFrame.addEventListener('click', () => {
+    if(farmVideo.paused){
+      farmVideo.play();
+      videoOverlay.style.opacity = '0';
+      videoOverlay.style.pointerEvents = 'none';
+    } else {
+      farmVideo.pause();
+      videoOverlay.style.opacity = '1';
+      videoOverlay.style.pointerEvents = 'auto';
+    }
+  });
+  
+  // Autoplay on scroll into view (muted)
+  const videoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        farmVideo.play().catch(()=>{});
+      } else {
+        farmVideo.pause();
+      }
+    });
+  }, { threshold:0.4 });
+  videoObserver.observe(videoFrame);
+
+  // ===== Full Gallery Overlay =====
+  const openGalleryBtn = document.getElementById('openGalleryBtn');
+  const closeGalleryBtn = document.getElementById('closeGalleryBtn');
+  const fullGalleryOverlay = document.getElementById('fullGalleryOverlay');
+
+  openGalleryBtn.addEventListener('click', () => {
+    fullGalleryOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  });
+
+  closeGalleryBtn.addEventListener('click', () => {
+    fullGalleryOverlay.classList.remove('active');
+    document.body.style.overflow = 'auto'; // Restore scrolling
+  });
+
+  // ===== Availability Calendar =====
+  const checkInInput  = document.getElementById('checkIn');
+  const checkOutInput = document.getElementById('checkOut');
+  const calGrid       = document.getElementById('calGrid');
+  const calMonthLabel = document.getElementById('calMonthLabel');
+  const calStatus     = document.getElementById('calStatus');
+  const calPrev       = document.getElementById('calPrev');
+  const calNext       = document.getElementById('calNext');
+
+  let bookedRanges = [];   // [{check_in, check_out}, ...]
+  let calYear, calMonth;   // currently displayed month
+  let selStart = null, selEnd = null;  // selected dates (Date objects)
+
+  const DAY_MS = 86400000;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date(todayStr);
+
+  function dateStr(d) { return d.toISOString().split('T')[0]; }
+  function parseDate(s) { return new Date(s + 'T00:00:00'); }
+
+  function isBooked(d) {
+    const t = d.getTime();
+    return bookedRanges.some(r => {
+      const cin  = parseDate(r.check_in).getTime();
+      const cout = parseDate(r.check_out).getTime();
+      return t >= cin && t < cout;
+    });
+  }
+
+  function rangeHasBooked(start, end) {
+    let d = new Date(start.getTime() + DAY_MS);
+    while (d < end) {
+      if (isBooked(d)) return true;
+      d = new Date(d.getTime() + DAY_MS);
+    }
+    return isBooked(start);
+  }
+
+  function renderCalendar() {
+    const MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    calMonthLabel.textContent = MONTHS[calMonth] + ' ' + calYear;
+    calGrid.innerHTML = '';
+
+    // Day name headers
+    DAYS.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'avail-cal-dayname';
+      el.textContent = d;
+      calGrid.appendChild(el);
+    });
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div');
+      el.className = 'avail-cal-day empty';
+      calGrid.appendChild(el);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(calYear, calMonth, day);
+      const ds = dateStr(d);
+      const el = document.createElement('div');
+      el.textContent = day;
+      el.dataset.date = ds;
+
+      const isPast    = d < today;
+      const isBookedDay = isBooked(d);
+      const isToday   = ds === todayStr;
+      const isSelStart = selStart && ds === dateStr(selStart);
+      const isSelEnd   = selEnd   && ds === dateStr(selEnd);
+      const isInRange  = selStart && selEnd && d > selStart && d < selEnd;
+
+      let cls = 'avail-cal-day ';
+      if (isPast)          cls += 'past';
+      else if (isBookedDay) cls += 'booked';
+      else                  cls += 'available';
+
+      if (isToday)        cls += ' today';
+      if (isSelStart)     cls += ' selected-start';
+      if (isSelEnd)       cls += ' selected-end';
+      if (isInRange)      cls += ' in-range';
+
+      el.className = cls;
+
+      if (!isPast && !isBookedDay) {
+        el.addEventListener('click', () => onDayClick(d));
+      }
+
+      calGrid.appendChild(el);
+    }
+  }
+
+  function onDayClick(d) {
+    // First click = check-in, second click = check-out
+    if (!selStart || (selStart && selEnd)) {
+      selStart = d; selEnd = null;
+      checkInInput.value  = dateStr(d);
+      checkOutInput.value = '';
+      calStatus.textContent = 'Now pick your check-out date.';
+    } else {
+      if (d <= selStart) {
+        selStart = d;
+        checkInInput.value  = dateStr(d);
+        checkOutInput.value = '';
+        calStatus.textContent = 'Now pick your check-out date.';
+        renderCalendar(); return;
+      }
+      if (rangeHasBooked(selStart, d)) {
+        calStatus.innerHTML = '<span style="color:#b91c1c">⚠ Your range includes booked dates. Please choose different dates.</span>';
+        return;
+      }
+      selEnd = d;
+      checkInInput.value  = dateStr(selStart);
+      checkOutInput.value = dateStr(selEnd);
+      const nights = Math.round((selEnd - selStart) / DAY_MS);
+      calStatus.innerHTML = `<span style="color:var(--ocean-deep);font-weight:600">✓ ${nights} night${nights!==1?'s':''} selected: ${checkInInput.value} → ${checkOutInput.value}</span>`;
+    }
+    renderCalendar();
+  }
+
+  // Fetch availability from API
+  async function fetchAvailability() {
+    try {
+      const res  = await fetch('/api/availability');
+      const data = await res.json();
+      bookedRanges = data.confirmed_ranges || [];
+      if (bookedRanges.length === 0) {
+        calStatus.textContent = 'All dates are currently available! Click a date to start.';
+      } else {
+        calStatus.textContent = 'Red dates are already booked. Click to select your check-in.';
+      }
+    } catch(e) {
+      calStatus.textContent = 'Could not load availability. You can still fill dates manually.';
+    }
+    renderCalendar();
+  }
+
+  // Initialize to current month
+  const now = new Date();
+  calYear  = now.getFullYear();
+  calMonth = now.getMonth();
+
+  calPrev.addEventListener('click', () => {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    // Don't go before current month
+    if (calYear < now.getFullYear() || (calYear === now.getFullYear() && calMonth < now.getMonth())) {
+      calMonth = now.getMonth(); calYear = now.getFullYear();
+    }
+    renderCalendar();
+  });
+
+  calNext.addEventListener('click', () => {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+
+  // Also update calendar highlight when user types directly in inputs
+  checkInInput.addEventListener('change', () => {
+    if (checkInInput.value) {
+      selStart = parseDate(checkInInput.value);
+      calYear  = selStart.getFullYear();
+      calMonth = selStart.getMonth();
+    }
+    renderCalendar();
+  });
+  checkOutInput.addEventListener('change', () => {
+    if (checkOutInput.value) selEnd = parseDate(checkOutInput.value);
+    renderCalendar();
+  });
+
+  fetchAvailability();
+
+  // ===== Booking Form Submit =====
+  const bookingForm = document.getElementById('bookingForm');
+  const toast    = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  const submitBtn = document.getElementById('submitBookingBtn');
+
+  bookingForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Final client-side range validation
+    if (checkInInput.value && checkOutInput.value) {
+      const cin  = parseDate(checkInInput.value);
+      const cout = parseDate(checkOutInput.value);
+      if (rangeHasBooked(cin, cout)) {
+        toastMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400 mr-2"></i> Your selected dates include already-booked nights. Please choose different dates.';
+        toast.style.borderColor = '#ef4444';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 6000);
+        return;
+      }
+    }
+
+    const payload = {
+      first_name: document.getElementById('firstName').value.trim(),
+      last_name:  document.getElementById('lastName').value.trim(),
+      email:      document.getElementById('email').value.trim(),
+      phone:      document.getElementById('phone').value.trim(),
+      check_in:   checkInInput.value,
+      check_out:  checkOutInput.value,
+      guests:     parseInt(document.getElementById('guests').value, 10),
+      package:    document.getElementById('packageSelect').value,
+      special_requests: document.getElementById('specialRequests').value.trim()
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Request...';
+
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toastMsg.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400 mr-2"></i> Booking request received! Jai will call you shortly.';
+        toast.style.borderColor = 'var(--beach)';
+        toast.classList.add('show');
+        bookingForm.reset();
+        selStart = null; selEnd = null;
+        await fetchAvailability();
+      } else {
+        const errorText = result.detail || 'Failed to submit booking. Please try again.';
+        toastMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400 mr-2"></i> ${errorText}`;
+        toast.style.borderColor = '#ef4444';
+        toast.classList.add('show');
+      }
+    } catch (err) {
+      toastMsg.innerHTML = '<i class="fa-solid fa-wifi text-red-400 mr-2"></i> Network error. Please check your backend server.';
+      toast.style.borderColor = '#ef4444';
+      toast.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Send Booking Request</span>';
+      setTimeout(() => toast.classList.remove('show'), 6000);
+    }
+  });
+
+  // ===== Smooth anchor scroll offset =====
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if(id.length > 1){
+        const el = document.querySelector(id);
+        if(el){
+          e.preventDefault();
+          const top = el.getBoundingClientRect().top + window.scrollY - 60;
+          window.scrollTo({ top, behavior:'smooth' });
+        }
+      }
+    });
+  });
+</script>
+</body>
+</html>

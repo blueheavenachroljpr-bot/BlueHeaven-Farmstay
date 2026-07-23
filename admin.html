@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Blue Heaven Farmhouse</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --ocean-deep:#0b3c5d;
+      --ocean:#14507a;
+      --sky:#328cc1;
+      --beach:#e6b450;
+      --beach-light:#f0d78a;
+      --sand:#f4f9fc;
+      --ink:#1a1a1a;
+    }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: #082133;
+      color: #e2e8f0;
+    }
+    .font-display { font-family: 'Cormorant Garamond', serif; }
+    .badge-pending { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .badge-confirmed { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .badge-cancelled { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="bg-[#051622] border-b border-white/10 px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-[var(--beach)]/20 text-[var(--beach)] flex items-center justify-center font-bold text-xl">
+        <i class="fa-solid fa-crown"></i>
+      </div>
+      <div>
+        <h1 class="font-display text-2xl text-[var(--beach)]">Blue Heaven Admin</h1>
+        <p class="text-xs text-slate-400">Reservation & Booking Management System</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="/" target="_blank" class="text-xs uppercase tracking-widest text-slate-300 hover:text-[var(--beach)] transition flex items-center gap-2">
+        <i class="fa-solid fa-external-link"></i> View Website
+      </a>
+      <button id="logoutBtn" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded text-xs uppercase tracking-wider transition">
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0b3c5d] border border-[var(--beach)]/40 p-8 rounded-lg max-w-md w-full shadow-2xl">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-[var(--beach)]/15 text-[var(--beach)] rounded-full flex items-center justify-center mx-auto text-3xl mb-3">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2 class="font-display text-3xl text-white">Owner Portal</h2>
+        <p class="text-xs text-slate-300 mt-1">Enter your password to manage reservations</p>
+      </div>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-slate-300 mb-2">Password</label>
+          <input type="password" id="adminPasswordInput" required placeholder="Enter password (default: admin123)"
+                 class="w-full px-4 py-3 bg-[#051622] border border-white/20 rounded text-white focus:outline-none focus:border-[var(--beach)]">
+        </div>
+        <p id="loginError" class="text-xs text-red-400 hidden text-center">Invalid admin password!</p>
+        <button type="submit" class="w-full bg-[var(--beach)] text-[var(--ocean-deep)] py-3 uppercase tracking-widest font-semibold rounded hover:bg-amber-400 transition">
+          Unlock Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6">
+    
+    <!-- STATS OVERVIEW -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-[#0b3c5d]/50 border border-white/10 rounded-lg p-5">
+        <div class="text-xs uppercase tracking-widest text-slate-400">Total Requests</div>
+        <div class="font-display text-4xl text-white mt-2" id="statTotal">0</div>
+      </div>
+      <div class="bg-[#0b3c5d]/50 border border-amber-500/30 rounded-lg p-5">
+        <div class="text-xs uppercase tracking-widest text-amber-400">Pending Review</div>
+        <div class="font-display text-4xl text-amber-400 mt-2" id="statPending">0</div>
+      </div>
+      <div class="bg-[#0b3c5d]/50 border border-emerald-500/30 rounded-lg p-5">
+        <div class="text-xs uppercase tracking-widest text-emerald-400">Confirmed Stays</div>
+        <div class="font-display text-4xl text-emerald-400 mt-2" id="statConfirmed">0</div>
+      </div>
+      <div class="bg-[#0b3c5d]/50 border border-red-500/30 rounded-lg p-5">
+        <div class="text-xs uppercase tracking-widest text-red-400">Cancelled</div>
+        <div class="font-display text-4xl text-red-400 mt-2" id="statCancelled">0</div>
+      </div>
+    </div>
+
+    <!-- CONTROLS & FILTERS -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-[#051622] p-4 rounded-lg border border-white/10">
+      <div class="flex gap-2">
+        <button class="filter-btn active bg-[var(--beach)] text-[var(--ocean-deep)] px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded" data-filter="all">
+          All (<span id="countAll">0</span>)
+        </button>
+        <button class="filter-btn bg-white/5 hover:bg-white/10 text-slate-300 px-4 py-2 text-xs uppercase tracking-wider font-medium rounded" data-filter="pending">
+          Pending (<span id="countPending">0</span>)
+        </button>
+        <button class="filter-btn bg-white/5 hover:bg-white/10 text-slate-300 px-4 py-2 text-xs uppercase tracking-wider font-medium rounded" data-filter="confirmed">
+          Confirmed (<span id="countConfirmed">0</span>)
+        </button>
+        <button class="filter-btn bg-white/5 hover:bg-white/10 text-slate-300 px-4 py-2 text-xs uppercase tracking-wider font-medium rounded" data-filter="cancelled">
+          Cancelled (<span id="countCancelled">0</span>)
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="refreshBtn" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded text-xs uppercase tracking-wider flex items-center gap-2 transition">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- BOOKINGS TABLE -->
+    <div class="bg-[#051622] border border-white/10 rounded-lg overflow-hidden shadow-2xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-[#0b3c5d] text-xs uppercase tracking-wider text-slate-300 border-b border-white/10">
+            <tr>
+              <th class="p-4">ID</th>
+              <th class="p-4">Guest Info</th>
+              <th class="p-4">Stay Dates</th>
+              <th class="p-4">Guests</th>
+              <th class="p-4">Package</th>
+              <th class="p-4">Special Requests</th>
+              <th class="p-4">Status</th>
+              <th class="p-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTableBody" class="divide-y divide-white/5">
+            <tr>
+              <td colspan="8" class="p-8 text-center text-slate-400">Loading reservations...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let allBookings = [];
+    let activeFilter = 'all';
+
+    function getAdminPassword() {
+      return localStorage.getItem('admin_token') || '';
+    }
+
+    function checkAuth() {
+      const pass = getAdminPassword();
+      if(!pass) {
+        document.getElementById('loginModal').classList.remove('hidden');
+      } else {
+        document.getElementById('loginModal').classList.add('hidden');
+        loadBookings();
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pass = document.getElementById('adminPasswordInput').value;
+      try {
+        const res = await fetch('/api/admin/verify', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({password: pass})
+        });
+        if(res.ok) {
+          localStorage.setItem('admin_token', pass);
+          document.getElementById('loginError').classList.add('hidden');
+          document.getElementById('loginModal').classList.add('hidden');
+          loadBookings();
+        } else {
+          document.getElementById('loginError').classList.remove('hidden');
+        }
+      } catch(err) {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('admin_token');
+      checkAuth();
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', loadBookings);
+
+    async function loadBookings() {
+      const pass = getAdminPassword();
+      try {
+        const res = await fetch('/api/admin/bookings', {
+          headers: {'X-Admin-Password': pass}
+        });
+        if(res.status === 401) {
+          localStorage.removeItem('admin_token');
+          checkAuth();
+          return;
+        }
+        const data = await res.json();
+        allBookings = data.bookings || [];
+        updateStats();
+        renderTable();
+      } catch(err) {
+        console.error('Error fetching bookings:', err);
+      }
+    }
+
+    function updateStats() {
+      const total = allBookings.length;
+      const pending = allBookings.filter(b => b.status === 'pending').length;
+      const confirmed = allBookings.filter(b => b.status === 'confirmed').length;
+      const cancelled = allBookings.filter(b => b.status === 'cancelled').length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPending').textContent = pending;
+      document.getElementById('statConfirmed').textContent = confirmed;
+      document.getElementById('statCancelled').textContent = cancelled;
+
+      document.getElementById('countAll').textContent = total;
+      document.getElementById('countPending').textContent = pending;
+      document.getElementById('countConfirmed').textContent = confirmed;
+      document.getElementById('countCancelled').textContent = cancelled;
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('bg-[var(--beach)]', 'text-[var(--ocean-deep)]', 'font-semibold');
+          b.classList.add('bg-white/5', 'text-slate-300', 'font-medium');
+        });
+        btn.classList.remove('bg-white/5', 'text-slate-300', 'font-medium');
+        btn.classList.add('bg-[var(--beach)]', 'text-[var(--ocean-deep)]', 'font-semibold');
+        activeFilter = btn.dataset.filter;
+        renderTable();
+      });
+    });
+
+    function renderTable() {
+      const tbody = document.getElementById('bookingsTableBody');
+      let filtered = allBookings;
+      if(activeFilter !== 'all') {
+        filtered = allBookings.filter(b => b.status === activeFilter);
+      }
+
+      if(filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-12 text-center text-slate-400">
+              <i class="fa-regular fa-folder-open text-4xl mb-3 block opacity-40"></i>
+              No ${activeFilter === 'all' ? '' : activeFilter} bookings found.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(b => {
+        const cin = new Date(b.check_in);
+        const cout = new Date(b.check_out);
+        const nights = Math.max(1, Math.round((cout - cin) / (1000 * 60 * 60 * 24)));
+        
+        let statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-semibold badge-pending">PENDING</span>`;
+        if(b.status === 'confirmed') {
+          statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-semibold badge-confirmed">CONFIRMED</span>`;
+        } else if(b.status === 'cancelled') {
+          statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-semibold badge-cancelled">CANCELLED</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition">
+            <td class="p-4 font-mono text-xs text-slate-400">#${b.id}</td>
+            <td class="p-4">
+              <div class="font-medium text-white">${escapeHtml(b.first_name)} ${escapeHtml(b.last_name)}</div>
+              <div class="text-xs text-slate-400 mt-0.5">
+                <a href="mailto:${escapeHtml(b.email)}" class="hover:text-[var(--beach)]"><i class="fa-regular fa-envelope"></i> ${escapeHtml(b.email)}</a>
+              </div>
+              <div class="text-xs text-slate-400">
+                <a href="https://wa.me/${escapeHtml(b.phone.replace(/[^0-9]/g, ''))}" target="_blank" class="hover:text-green-400"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(b.phone)}</a>
+              </div>
+            </td>
+            <td class="p-4">
+              <div class="text-white font-medium"><i class="fa-regular fa-calendar-check text-[var(--beach)] mr-1"></i> ${b.check_in}</div>
+              <div class="text-xs text-slate-400 mt-0.5">to ${b.check_out} (${nights} night${nights > 1 ? 's' : ''})</div>
+            </td>
+            <td class="p-4 text-center font-medium">${b.guests}</td>
+            <td class="p-4">
+              <span class="bg-white/10 px-2 py-1 rounded text-xs text-slate-200">${escapeHtml(b.package)}</span>
+            </td>
+            <td class="p-4 text-xs text-slate-300 max-w-xs truncate" title="${escapeHtml(b.special_requests || '')}">
+              ${escapeHtml(b.special_requests) || '<span class="italic text-slate-500">None</span>'}
+            </td>
+            <td class="p-4">${statusBadge}</td>
+            <td class="p-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                ${b.status !== 'confirmed' ? `
+                  <button onclick="updateStatus(${b.id}, 'confirmed')" title="Confirm Booking" class="bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded text-xs transition">
+                    <i class="fa-solid fa-check"></i> Confirm
+                  </button>
+                ` : ''}
+                ${b.status !== 'cancelled' ? `
+                  <button onclick="updateStatus(${b.id}, 'cancelled')" title="Cancel Booking" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded text-xs transition">
+                    <i class="fa-solid fa-ban"></i> Cancel
+                  </button>
+                ` : ''}
+                <button onclick="deleteBooking(${b.id})" title="Delete" class="bg-red-600/30 hover:bg-red-600/50 text-red-300 border border-red-500/40 px-2 py-1 rounded text-xs transition">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateStatus(id, newStatus) {
+      const pass = getAdminPassword();
+      try {
+        const res = await fetch(`/api/admin/bookings/${id}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Password': pass
+          },
+          body: JSON.stringify({status: newStatus})
+        });
+        const data = await res.json();
+        if(res.ok) {
+          loadBookings();
+        } else {
+          alert(data.detail || 'Failed to update status');
+        }
+      } catch(err) {
+        alert('Error communicating with server');
+      }
+    }
+
+    async function deleteBooking(id) {
+      if(!confirm(`Are you sure you want to delete booking #${id}?`)) return;
+      const pass = getAdminPassword();
+      try {
+        const res = await fetch(`/api/admin/bookings/${id}`, {
+          method: 'DELETE',
+          headers: {'X-Admin-Password': pass}
+        });
+        if(res.ok) {
+          loadBookings();
+        } else {
+          alert('Failed to delete booking');
+        }
+      } catch(err) {
+        alert('Error communicating with server');
+      }
+    }
+
+    function escapeHtml(str) {
+      if(!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Init
+    checkAuth();
+  </script>
+</body>
+</html>
