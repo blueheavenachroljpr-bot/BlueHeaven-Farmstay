@@ -15,7 +15,7 @@ def notify_owner_new_booking(booking: dict):
     subject = f"🚨 New Booking Request #{booking['id']} - {booking['first_name']} {booking['last_name']}"
     body = f"""
 ==================================================
-BLUE HEAVEN FARMHOUSE — NEW BOOKING REQUEST
+BLUE HEAVEN FARM STAY & RESORT — NEW BOOKING REQUEST
 ==================================================
 Booking ID : #{booking['id']}
 Guest Name : {booking['first_name']} {booking['last_name']}
@@ -40,7 +40,7 @@ Submitted  : {booking['created_at']}
             req = urllib.request.Request(
                 "https://api.resend.com/emails",
                 data=json.dumps({
-                    "from": "Blue Heaven <bookings@blueheavenfarmhouse.com>",
+                    "from": "Blue Heaven Farm Stay & Resort <bookings@blueheavenfarmhouse.com>",
                     "to": [owner_email],
                     "subject": subject,
                     "text": body

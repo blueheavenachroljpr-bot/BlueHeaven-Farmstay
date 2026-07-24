@@ -17,7 +17,7 @@ from notifications import notify_owner_new_booking
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 app = FastAPI(
-    title="Blue Heaven Farmhouse Booking API",
+    title="Blue Heaven Farm Stay & Resort Booking API",
     description="Backend API for managing guest reservations & availability",
     version="1.0.0"
 )
@@ -80,7 +80,7 @@ def serve_admin():
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "service": "Blue Heaven Farmhouse API"}
+    return {"status": "ok", "service": "Blue Heaven Farm Stay & Resort API"}
 
 @app.get("/api/availability")
 def get_availability():
